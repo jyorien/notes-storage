@@ -1,0 +1,7 @@
+{
+  "name": "notes-storage",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
