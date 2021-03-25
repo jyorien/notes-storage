@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { Plugins } from '@capacitor/core';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { HomePageRoutingModule } from './home-routing.module';
 const { Storage } = Plugins;
 @Component({
   selector: 'app-home',
@@ -9,7 +11,8 @@ const { Storage } = Plugins;
 })
 export class HomePage implements OnInit {
   notes: any = [];
-  constructor(private alertController: AlertController) {}
+  constructor(private alertController: AlertController, private localNotifications: LocalNotifications) {
+  }
 
   add() {
     const alert = this.alertController.create({
@@ -79,17 +82,28 @@ export class HomePage implements OnInit {
     this.notes = JSON.parse(res.value)
   }
 
-  setReminder() {
+  setReminder(note) {
     const alert = this.alertController.create({
       header: "Set time",
-      inputs: [{name: 'time',type:'time'}],
+      inputs: [{name: 'time',type:'number',placeholder:'minutes'}],
       buttons:[
       {text:"Cancel",role:'cancel'},
       {text:"Set", handler: (alertData) => {
+        console.log(alertData)
+        var milisecs = alertData.time * 60000
+        this.setNotification(note.toString(),milisecs)
+        
 
       }}
     ]
     }).then(alert => alert.present())
+  }
+
+  setNotification(note,milisec) {
+    this.localNotifications.schedule({
+      text: note,
+      trigger: { at: new Date(new Date().getTime() + milisec)},
+    })
   }
 
   ngOnInit() {
